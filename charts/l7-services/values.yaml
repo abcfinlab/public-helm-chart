@@ -1,15 +1,15 @@
 gcpProjectId: ""
 gcpProjectNumber: ""
 
-projectIamRoles: [ ]
+projectIamRoles: []
 
-topics: [ ]
+topics: []
 
-subscriptions: [ ]
+subscriptions: []
 
-buckets: [ ]
+buckets: []
 
-databases: [ ]
+databases: []
 
 serviceName: ""
 image:
@@ -23,9 +23,9 @@ imagePullSecrets:
 
 serviceAccount:
   # Annotations to add to the service account
-  annotations: { }
+  annotations: {}
 
-podAnnotations: { }
+podAnnotations: {}
 
 podSecurityContext:
   runAsNonRoot: true
@@ -56,7 +56,7 @@ ingress:
 #        - path: /
 #          pathType: Prefix
 
-env: [ ]
+env: []
 
 resources:
   limits:
@@ -66,8 +66,8 @@ resources:
     cpu: "500m"
     memory: "1Gi"
 
-livenessProbe: { }
-readinessProbe: { }
+livenessProbe: {}
+readinessProbe: {}
 
 ## INFO ##
 # - replicaCount is ignored if autoscaling is enabled
@@ -80,8 +80,8 @@ autoscaling:
 #  targetCPUUtilizationPercentage: 80
 #  targetMemoryUtilizationPercentage: 80
 
-nodeSelector: { }
+nodeSelector: {}
 
-tolerations: [ ]
+tolerations: []
 
-affinity: { }
+affinity: {}
