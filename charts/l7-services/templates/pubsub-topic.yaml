@@ -1,0 +1,27 @@
+{{- $root := . -}}
+{{- range .Values.topics }}
+{{- $serviceAccountName := include "var.serviceAccountName" $root -}}
+{{- $serviceAccountPrinciple := include "var.serviceAccountPrinciple" $root -}}
+{{- if .create }}
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: Topic
+metadata:
+  name: {{ .name }}
+spec:
+  forProvider: { }
+{{- end}}
+{{- if .publisher }}
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: TopicIAMMember
+metadata:
+  name: "{{ $serviceAccountName }}-{{ .name }}-publisher-iam-member"
+spec:
+  forProvider:
+    member: "serviceAccount:{{ $serviceAccountPrinciple }}"
+    role: roles/pubsub.publisher
+    topicRef:
+      name: {{ .name }}
+{{- end}}
+{{- end}}

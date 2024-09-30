@@ -1,0 +1,13 @@
+{{- $root := . -}}
+{{- range .Values.databases }}
+{{- $serviceAccountName := include "var.serviceAccountName" $root -}}
+apiVersion: sql.gcp.upbound.io/v1beta1
+kind: Database
+metadata:
+  name: {{ $serviceAccountName }}-db
+  annotations:
+    crossplane.io/external-name: {{ .name }}
+spec:
+  forProvider:
+    instance: {{ .instanceName }}
+{{- end }}

@@ -1,0 +1,15 @@
+{{- $root := . -}}
+{{- range .Values.projectIamRoles }}
+{{- $serviceAccountName := include "var.serviceAccountName" $root -}}
+{{- $serviceAccountPrinciple := include "var.serviceAccountPrinciple" $root -}}
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: ProjectIAMMember
+metadata:
+  name: {{ $serviceAccountName }}-{{ . | replace "roles/" "" | replace "." "-" | lower }}
+spec:
+  forProvider:
+    member: {{ printf "serviceAccount:%s" $serviceAccountPrinciple }}
+    project: {{ $.Values.gcpProjectId }}
+    role: {{ . }}
+---
+{{- end }}

@@ -1,0 +1,78 @@
+{{- $root := . -}}
+{{- range .Values.subscriptions }}
+{{- $serviceAccountName := include "var.serviceAccountName" $root -}}
+{{- $serviceAccountPrinciple := include "var.serviceAccountPrinciple" $root -}}
+{{- if .create }}
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: Subscription
+metadata:
+  name: {{ .name }}
+spec:
+  forProvider:
+    ackDeadlineSeconds: 10
+    messageRetentionDuration: 604800s # 7 days
+    retainAckedMessages: false
+    enableExactlyOnceDelivery: true
+    {{- if .deadLetterPolicy }}
+    deadLetterPolicy:
+      - maxDeliveryAttempts: 5
+        deadLetterTopicRef:
+          name: {{ .name }}-dead-letter-topic
+    {{- end }}
+    expirationPolicy:
+      - ttl: "" # never expire
+    retryPolicy:
+      - maximumBackoff: 600s
+        minimumBackoff: 10s
+    topicRef:
+      name: {{ .topicRef }}
+{{- end}}
+{{- if .subscriber }}
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: SubscriptionIAMMember
+metadata:
+  name: "{{ $serviceAccountName }}-{{ .name }}-subscriber-iam-member"
+spec:
+  forProvider:
+    member: "serviceAccount:{{ $serviceAccountPrinciple }}"
+    role: roles/pubsub.subscriber
+    subscriptionRef:
+      name: {{ .name }}
+{{- end}}
+{{- if .deadLetterPolicy }}
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: Topic
+metadata:
+  name: {{ .name }}-dead-letter-topic
+spec:
+  forProvider: { }
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: TopicIAMMember
+metadata:
+  name: "pubsub-service-{{ .name }}-dead-letter-topic-publisher-iam-member"
+spec:
+  forProvider:
+    member: "serviceAccount:service-{{ $.Values.gcpProjectNumber }}@gcp-sa-pubsub.iam.gserviceaccount.com"
+    role: roles/pubsub.publisher
+    topicRef:
+      name: {{ .name }}-dead-letter-topic
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: Subscription
+metadata:
+  name: {{ .name }}-dead-letter-sub
+spec:
+  forProvider:
+    ackDeadlineSeconds: 10
+    messageRetentionDuration: 604800s # 7 days
+    retainAckedMessages: false
+    expirationPolicy:
+      - ttl: "" # never expire
+    topicRef:
+      name: {{ .name }}-dead-letter-topic
+{{- end}}
+{{- end}}

@@ -1,0 +1,28 @@
+{{- $root := . -}}
+{{- range .Values.buckets }}
+{{- $serviceAccountName := include "var.serviceAccountName" $root -}}
+{{- $serviceAccountPrinciple := include "var.serviceAccountPrinciple" $root -}}
+{{- if .create }}
+apiVersion: storage.gcp.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  name: {{ .name }}
+spec:
+  forProvider:
+    location: {{ .location }}
+    storageClass: {{ .storageClass | default "STANDARD" }}
+    publicAccessPrevention: {{ .publicAccessPrevention | default "enforced"  }}
+{{- end }}
+---
+apiVersion: storage.gcp.upbound.io/v1beta1
+kind: BucketIAMMember
+metadata:
+  name: {{ $serviceAccountName }}-{{ .name }}-iam-member-{{ .role | replace "roles/" "" | replace "." "-" | lower }}
+spec:
+  forProvider:
+    bucketRef:
+      name: {{ .name }}
+    member: "serviceAccount:{{ $serviceAccountPrinciple }}"
+    role: {{ .role }}
+---
+{{- end }}
