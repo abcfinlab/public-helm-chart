@@ -4,7 +4,6 @@ metadata:
   name: {{ include "var.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    deployment-version: {{ .Values.image.tag }}
     {{- include "var.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -20,6 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
+        service-version: {{ $.Values.image.tag }}
         {{- include "var.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
