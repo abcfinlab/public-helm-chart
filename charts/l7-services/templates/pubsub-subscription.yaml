@@ -74,5 +74,16 @@ spec:
       - ttl: "" # never expire
     topicRef:
       name: {{ .name }}-dead-letter-topic
+---
+apiVersion: pubsub.gcp.upbound.io/v1beta1
+kind: SubscriptionIAMMember
+metadata:
+  name: "pubsub-service-{{ .name }}-dead-letter-sub-subscriber-iam-member"
+spec:
+  forProvider:
+    member: "serviceAccount:service-{{ $.Values.gcpProjectNumber }}@gcp-sa-pubsub.iam.gserviceaccount.com"
+    role: roles/pubsub.subscriber
+    subscriptionRef:
+      name: {{ .name }}-dead-letter-sub
 {{- end}}
 {{- end}}
