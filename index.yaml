@@ -2,6 +2,17 @@ apiVersion: v1
 entries:
   l7-service:
   - apiVersion: v2
+    created: "2024-10-15T10:57:11.6541301Z"
+    description: A Helm chart for a l7-service
+    digest: 9ba3c3a3eb5f0e162379404d1a6978d8841756da80addfca2eb9cdcb33ac97d4
+    maintainers:
+    - name: cpoyatos1
+    name: l7-service
+    type: application
+    urls:
+    - https://github.com/abcfinlab-GmbH/public-helm-chart/releases/download/l7-service-1.1.2/l7-service-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v2
     created: "2024-10-14T10:42:24.71174101Z"
     description: A Helm chart for a l7-service
     digest: b336e6f0fe4ee56a043e4fe625d9631035d78f7bf3f923fa18e8c953524d2aa0
@@ -34,4 +45,4 @@ entries:
     urls:
     - https://github.com/abcfinlab-GmbH/public-helm-chart/releases/download/l7-service-1.0.1/l7-service-1.0.1.tgz
     version: 1.0.1
-generated: "2024-10-14T10:42:24.711760719Z"
+generated: "2024-10-15T10:57:11.654149586Z"
