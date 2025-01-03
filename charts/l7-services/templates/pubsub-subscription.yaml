@@ -84,6 +84,6 @@ spec:
     member: "serviceAccount:service-{{ $.Values.gcpProjectNumber }}@gcp-sa-pubsub.iam.gserviceaccount.com"
     role: roles/pubsub.subscriber
     subscriptionRef:
-      name: {{ .name }}
+      name: {{ .name }}-dead-letter-sub
 {{- end}}
 {{- end}}
