@@ -10,7 +10,7 @@ metadata:
   name: {{ .name }}
 spec:
   forProvider:
-    ackDeadlineSeconds: 10
+    ackDeadlineSeconds: 30
     messageRetentionDuration: 604800s # 7 days
     retainAckedMessages: false
     enableExactlyOnceDelivery: true
