@@ -90,3 +90,33 @@ initContainers: []
 # - name: init-container
 #   image: busybox:latest
 #   command: ['sh', '-c', 'echo "Init container running"']
+
+cronJobs:
+  enabled: false
+  # jobs:
+  #   - name: example-cronjob
+  #     schedule: "*/5 * * * *"
+  #     concurrencyPolicy: Forbid
+  #     successfulJobsHistoryLimit: 3
+  #     failedJobsHistoryLimit: 1
+  #     suspend: false
+  #     startingDeadlineSeconds: 60
+  #     backoffLimit: 3
+  #     activeDeadlineSeconds: 600
+  #     ttlSecondsAfterFinished: 86400
+  #     restartPolicy: OnFailure
+  #     image:
+  #       # If not specified, will use the main image from the chart
+  #       repository: ""
+  #       tag: ""
+  #       pullPolicy: Always
+  #     command: []
+  #     args: []
+  #     env: []
+  #     resources:
+  #       limits:
+  #         cpu: "200m"
+  #         memory: "256Mi"
+  #       requests:
+  #         cpu: "100m"
+  #         memory: "128Mi"
