@@ -85,3 +85,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+initContainers: []
+# - name: init-container
+#   image: busybox:latest
+#   command: ['sh', '-c', 'echo "Init container running"']
