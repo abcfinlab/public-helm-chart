@@ -1,0 +1,100 @@
+{{- if .Values.cronJobs.enabled }}
+{{- range .Values.cronJobs.jobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "var.fullname" $ }}-{{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "var.labels" $ | nindent 4 }}
+    cronjob-name: {{ .name }}
+spec:
+  schedule: {{ .schedule | quote }}
+  {{- if .concurrencyPolicy }}
+  concurrencyPolicy: {{ .concurrencyPolicy }}
+  {{- end }}
+  {{- if .successfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
+  {{- end }}
+  {{- if .failedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .failedJobsHistoryLimit }}
+  {{- end }}
+  {{- if .suspend }}
+  suspend: {{ .suspend }}
+  {{- end }}
+  {{- if .startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ .startingDeadlineSeconds }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      {{- if .backoffLimit }}
+      backoffLimit: {{ .backoffLimit }}
+      {{- end }}
+      {{- if .activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ .activeDeadlineSeconds }}
+      {{- end }}
+      {{- if .ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ .ttlSecondsAfterFinished }}
+      {{- end }}
+      template:
+        metadata:
+          labels:
+            {{- include "var.selectorLabels" $ | nindent 12 }}
+            cronjob-name: {{ .name }}
+        spec:
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "var.serviceAccountName" $ }}
+          {{- with $.Values.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .name }}
+              {{- with $.Values.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              image: "{{ default $.Values.image.repository .image.repository }}:{{ default $.Values.image.tag .image.tag }}"
+              imagePullPolicy: {{ default $.Values.image.pullPolicy .image.pullPolicy }}
+              {{- if .command }}
+              command:
+                {{- toYaml .command | nindent 16 }}
+              {{- end }}
+              {{- if .args }}
+              args:
+                {{- toYaml .args | nindent 16 }}
+              {{- end }}
+              {{- with .env }}
+              env:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- else }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
+              {{- end }}
+          {{- if .restartPolicy }}
+          restartPolicy: {{ .restartPolicy }}
+          {{- else }}
+          restartPolicy: OnFailure
+          {{- end }}
+          {{- with $.Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}
