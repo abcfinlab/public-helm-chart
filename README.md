@@ -36,6 +36,24 @@ cronJobs:
           value: "value"
 ```
 
+Each CronJob can be configured with:
+- `name`: Name of the CronJob (required)
+- `schedule`: Cron schedule expression (required)
+- `concurrencyPolicy`: How to handle concurrent executions (Allow, Forbid, Replace)
+- `successfulJobsHistoryLimit`: How many successful jobs to keep
+- `failedJobsHistoryLimit`: How many failed jobs to keep
+- `suspend`: Whether to suspend the CronJob
+- `startingDeadlineSeconds`: Deadline for starting jobs
+- `backoffLimit`: Number of retries before job is marked as failed
+- `activeDeadlineSeconds`: Time limit for job execution
+- `ttlSecondsAfterFinished`: Time to keep completed jobs
+- `restartPolicy`: Pod restart policy (OnFailure, Never)
+- `image`: Custom image for the CronJob (falls back to main chart image if not specified)
+- `command`: Command to run
+- `args`: Arguments for the command
+- `env`: Environment variables
+- `resources`: Resource requests and limits
+
 #### Merging Envs
 
 As of version 1.4.0, the chart supports merging the normal container envs with the initContainers or cronJobs envs.
@@ -120,24 +138,6 @@ l7-service:
     periodSeconds: 15
     successThreshold: 2
 ```
-
-Each CronJob can be configured with:
-- `name`: Name of the CronJob (required)
-- `schedule`: Cron schedule expression (required)
-- `concurrencyPolicy`: How to handle concurrent executions (Allow, Forbid, Replace)
-- `successfulJobsHistoryLimit`: How many successful jobs to keep
-- `failedJobsHistoryLimit`: How many failed jobs to keep
-- `suspend`: Whether to suspend the CronJob
-- `startingDeadlineSeconds`: Deadline for starting jobs
-- `backoffLimit`: Number of retries before job is marked as failed
-- `activeDeadlineSeconds`: Time limit for job execution
-- `ttlSecondsAfterFinished`: Time to keep completed jobs
-- `restartPolicy`: Pod restart policy (OnFailure, Never)
-- `image`: Custom image for the CronJob (falls back to main chart image if not specified)
-- `command`: Command to run
-- `args`: Arguments for the command
-- `env`: Environment variables
-- `resources`: Resource requests and limits
 
 ## Release
 
