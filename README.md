@@ -36,6 +36,91 @@ cronJobs:
           value: "value"
 ```
 
+#### Merging Envs
+
+As of version 1.4.0, the chart supports merging the normal container envs with the initContainers or cronJobs envs.
+
+To enable merge env, first set `envMerging.enabled` to `true` and define your stategy `envMerging.strategy`. (global option)
+
+Available stategies are:
+- mainOverrides (default)
+- initOverrides
+
+You can then enable the merging of the environment variables separately for each cron job or inti container.
+
+Working example:
+```yaml
+l7-service:
+  image:
+    repository: &repo "europe-west3-docker.pkg.dev/common-l7/lease-seven-images/bankdata-service"
+    #x-release-please-start-version
+    tag: &tag '1.2.1'
+    #x-release-please-end
+  envMerging:
+    enabled: true
+    strategy: "mainOverrides"
+
+  initContainers:
+    - name: db-migration
+      mergeEnv: true # ✅ Add this flag to enable env merge
+      image:
+        repository: *repo
+        tag: *tag
+      env:
+        - name: FLYWAY_ENABLED
+          value: "true"
+        - name: SPRING_WEB_APP_TYPE
+          value: "none"
+    - name: bankdata-sync
+      mergeEnv: true # ✅ Add this flag to enable env merge
+      image:
+        repository: *repo
+        tag: *tag
+      env:
+        - name: ABCFINLAB_FEDERAL_BANK_INIT_SYNC
+          value: "true"
+  cronJobs:
+    enabled: true
+    jobs:
+      - name: bankdata-sync
+        mergeEnv: true # ✅ Add this flag to enable env merge
+        schedule: "0 0 * * *"
+        concurrencyPolicy: Forbid
+        successfulJobsHistoryLimit: 3
+        failedJobsHistoryLimit: 1
+        restartPolicy: Never
+        image:
+          repository: *repo
+          tag: *tag
+        env:
+          - name: ABCFINLAB_FEDERAL_BANK_INIT_SYNC
+            value: "true"
+  serviceName: bankdata-service
+  nodeSelector:
+    topology.kubernetes.io/zone: "europe-west3-a"
+  databases:
+    - name: bankdata_service
+      instanceName: lease-seven
+  projectIamRoles:
+    - roles/cloudsql.client
+    - roles/cloudsql.instanceUser
+  resources:
+    limits:
+      cpu: 500m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  readinessProbe:
+    failureThreshold: 2
+    httpGet:
+      path: /bankdata-service/actuator/health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    successThreshold: 2
+```
+
 Each CronJob can be configured with:
 - `name`: Name of the CronJob (required)
 - `schedule`: Cron schedule expression (required)
