@@ -68,9 +68,14 @@ spec:
               args:
                 {{- toYaml .args | nindent 16 }}
               {{- end }}
+              {{- if and ($.Values.envMerging.enabled) (.mergeEnv) }}
+              env:
+                {{- include "mergeEnvironmentVariables" (dict "mainEnv" $.Values.env "initEnv" .env "strategy" $.Values.envMerging.strategy) | nindent 16 }}
+              {{- else }}
               {{- with .env }}
               env:
                 {{- toYaml . | nindent 16 }}
+              {{- end }}
               {{- end }}
               {{- with .resources }}
               resources:

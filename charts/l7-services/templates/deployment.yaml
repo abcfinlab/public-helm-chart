@@ -33,7 +33,19 @@ spec:
       {{- end }}
       {{- with .Values.initContainers }}
       initContainers:
-        {{- toYaml . | nindent 8 }}
+        {{- range $idx, $container := . }}
+        - name: {{ $container.name }}
+          image: "{{ $container.image.repository }}:{{ $container.image.tag }}"
+          {{- if and ($.Values.envMerging.enabled) ($container.mergeEnv) }}
+          env:
+            {{- include "mergeEnvironmentVariables" (dict "mainEnv" $.Values.env "initEnv" $container.env "strategy" $.Values.envMerging.strategy) | nindent 12 }}
+          {{- else }}
+          {{- with $container.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
       {{- end }}
       containers:
         - name: {{ include "var.name" . }}

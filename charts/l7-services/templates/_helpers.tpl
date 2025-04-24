@@ -53,3 +53,63 @@ Create GCP service account principle
 {{- define "var.serviceAccountPrinciple" -}}
 {{ include "var.serviceAccountName" . }}@{{ .Values.gcpProjectId }}.iam.gserviceaccount.com
 {{- end }}
+
+{{- define "mergeEnvironmentVariables" -}}
+{{- $mainEnv := .mainEnv | default list -}}
+{{- $initEnv := .initEnv | default list -}}
+{{- $strategy := .strategy | default "mainOverrides" -}}
+
+{{- if eq $strategy "mainOverrides" -}}
+  {{- /* Convert init env to map for easier lookup */ -}}
+  {{- $initEnvMap := dict -}}
+  {{- range $initEnv -}}
+    {{- $_ := set $initEnvMap .name . -}}
+  {{- end -}}
+
+  {{- /* Start with init env */ -}}
+  {{- $result := $initEnv -}}
+
+  {{- /* Add or override with main env */ -}}
+  {{- range $mainEnv -}}
+    {{- $result = append $result . -}}
+  {{- end -}}
+
+  {{- /* Remove duplicates (keeping main container values) */ -}}
+  {{- $finalResult := list -}}
+  {{- $seenNames := dict -}}
+  {{- range $result | reverse -}}
+    {{- if not (hasKey $seenNames .name) -}}
+      {{- $finalResult = append $finalResult . -}}
+      {{- $_ := set $seenNames .name "seen" -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $finalResult | reverse | toYaml -}}
+{{- else if eq $strategy "initOverrides" -}}
+  {{- /* Convert main env to map for easier lookup */ -}}
+  {{- $mainEnvMap := dict -}}
+  {{- range $mainEnv -}}
+    {{- $_ := set $mainEnvMap .name . -}}
+  {{- end -}}
+
+  {{- /* Start with main env */ -}}
+  {{- $result := $mainEnv -}}
+
+  {{- /* Add or override with init env */ -}}
+  {{- range $initEnv -}}
+    {{- $result = append $result . -}}
+  {{- end -}}
+
+  {{- /* Remove duplicates (keeping init container values) */ -}}
+  {{- $finalResult := list -}}
+  {{- $seenNames := dict -}}
+  {{- range $result | reverse -}}
+    {{- if not (hasKey $seenNames .name) -}}
+      {{- $finalResult = append $finalResult . -}}
+      {{- $_ := set $seenNames .name "seen" -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $finalResult | reverse | toYaml -}}
+{{- end -}}
+{{- end -}}
