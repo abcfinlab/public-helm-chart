@@ -39,6 +39,10 @@ spec:
       {{- end }}
       template:
         metadata:
+          {{- with .annotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           labels:
             {{- include "var.selectorLabels" $ | nindent 12 }}
             cronjob-name: {{ .name }}
