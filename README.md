@@ -1,3 +1,5 @@
+# ⚠️ This repo has been migrated to https://github.com/lease-seven/helm-charts
+
 # public-helm-chart
 
 ## Charts
